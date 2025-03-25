@@ -1,0 +1,24 @@
+name: Notify on Push via Email (Gmail SMTP)
+
+on:
+  push:
+    branches:
+      - '*'  # Runs on all branches
+
+jobs:
+  send_email:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Email Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: "sandeshh765@gmail.com"
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: "🚀 GitHub Repository Update: Push Detected!"
+          body: "A new push has occurred in the repository **${{ github.repository }}** by **${{ github.actor }}**. Check it out here: https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+          to: "anjalpoudel517@gmail.com, lochanpaudel10@gmail.com"  
+          from: "sandeshh765@gmail.com"
+          content_type: text/html
