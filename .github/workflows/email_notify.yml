@@ -19,6 +19,6 @@ jobs:
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
           subject: "🚀 GitHub Repository Update: Push Detected!"
           body: "A new push has occurred in the repository **${{ github.repository }}** by **${{ github.actor }}**. Check it out here: https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
-          to: "anjalpoudel517@gmail.com, lochanpaudel10@gmail.com"  
+          to: "anjalpoudel517@gmail.com, lochanpaudel10@gmail.com, gaurabkus781@gmail.com"  
           from: "sandeshh765@gmail.com"
           content_type: text/html
