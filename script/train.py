@@ -8,6 +8,14 @@ from torch.utils.data import DataLoader, Dataset
 from sklearn.model_selection import train_test_split
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 
+# ✅ Ensure script is in the right directory
+if os.path.exists("/opt/ml/code/"):
+    os.chdir("/opt/ml/code/")  
+    print("✅ Changed working directory to:", os.getcwd())
+
+# ✅ Debugging: Print available files
+print("📂 Files in /opt/ml/code/:", os.listdir("/opt/ml/code/"))
+
 # Custom Dataset class
 class FakeNewsDataset(Dataset):
     def __init__(self, data, max_len=128):
@@ -44,10 +52,20 @@ class FakeNewsClassifier(nn.Module):
 def train(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # Load data from S3
-    train_data = pd.read_csv(args.train_data)
-    test_data = pd.read_csv(args.test_data)
+    # ✅ SageMaker auto-mounts S3 data in /opt/ml/input/data/
+    train_data_path = os.path.join("/opt/ml/input/data/train", "train.csv")
+    test_data_path = os.path.join("/opt/ml/input/data/test", "test.csv")
 
+    print(f"🔍 Looking for training data at: {train_data_path}")
+    print(f"🔍 Looking for testing data at: {test_data_path}")
+
+    # ✅ Ensure the dataset exists before loading
+    if not os.path.exists(train_data_path) or not os.path.exists(test_data_path):
+        raise FileNotFoundError("❌ Training/Test data not found in expected SageMaker input directories!")
+
+    # ✅ Load data
+    train_data = pd.read_csv(train_data_path)
+    test_data = pd.read_csv(test_data_path)
     train_data.dropna(inplace=True)
     train_data, val_data = train_test_split(train_data, test_size=0.2, random_state=42)
 
@@ -74,24 +92,23 @@ def train(args):
             optimizer.step()
             total_train_loss += loss.item()
 
-        print(f"Epoch {epoch+1}/{args.epochs}, Training Loss: {total_train_loss/len(train_loader):.4f}")
+        print(f"✅ Epoch {epoch+1}/{args.epochs}, Training Loss: {total_train_loss/len(train_loader):.4f}")
 
-    # Save model
+    # ✅ Save the trained model
     model_path = os.path.join(args.model_dir, "model.pth")
     torch.save(model.state_dict(), model_path)
+    print(f"✅ Model saved at {model_path}")
 
-    # Compress model to .tar.gz for SageMaker
+    # ✅ Compress model to .tar.gz for SageMaker deployment
     tar_path = os.path.join(args.model_dir, "model.tar.gz")
     with tarfile.open(tar_path, "w:gz") as tar:
         tar.add(model_path, arcname="model.pth")
 
-    print(f"Model saved at {tar_path}")
+    print(f"✅ Model compressed and saved at {tar_path}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model-dir", type=str, default=os.environ["SM_MODEL_DIR"])
-    parser.add_argument("--train-data", type=str, default="s3://sagemaker-bucket-pbl/dataset/training/train.csv")
-    parser.add_argument("--test-data", type=str, default="s3://sagemaker-bucket-pbl/dataset/testing/test.csv")
     parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--learning-rate", type=float, default=2e-5)
