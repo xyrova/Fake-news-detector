@@ -19,18 +19,7 @@ except Exception as e:
     print(f"Error creating SageMaker session. Ensure AWS credentials are configured. Error: {e}")
     exit()
 
-# --- Verify Role ARN ---
-if '111122223333' in role_arn or 'YourSageMakerExecutionRoleName' in role_arn:
-    print("="*50)
-    print("ERROR: Please replace the placeholder 'role_arn' with your actual SageMaker Execution Role ARN in the deploy_endpoint.py script.")
-    print("="*50)
-    exit()
-if 's3://your-bucket/path/to/your/model.tar.gz' in s3_model_uri:
-    print("="*50)
-    print("ERROR: Please replace the placeholder 's3_model_uri' with the actual S3 path to your final_model.tar.gz in the deploy_endpoint.py script.")
-    print("="*50)
-    exit()
-
+                
 print(f"Using Role ARN: {role_arn}")
 print(f"Using Model S3 URI: {s3_model_uri}")
 
