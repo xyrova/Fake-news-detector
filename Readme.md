@@ -48,7 +48,7 @@ When users encounter questionable news content, they can simply click the extens
 ## 🚀 Key Features
 
 - ⚡ **Response Time:** < 1 second  
-- 🎯 **Accuracy Rate:** 95%  
+- 🎯 **Accuracy Rate:** ~90% on benchmark datasets
 - 🔐 **Privacy-Focused:** No data storage  
 - 📘 **Detailed Analysis Breakdown**  
 - 🧭 **Clear Visual Indicators**  ( Upcoming Patch )
